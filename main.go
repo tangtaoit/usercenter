@@ -4,9 +4,20 @@ import (
 	"net/http"
 	"io"
 	"fmt"
-	"usercenter/db"
+	"database/sql"
+	"log"
+	 _ "github.com/go-sql-driver/mysql"
 )
 
+var db *sql.DB
+
+func init() {
+	log.Println("dsdsd");
+	db, _ = sql.Open("mysql", "tangtao:123456@tcp(172.30.121.158:3307)/sampledb?charset=utf8")
+	db.SetMaxOpenConns(2000)
+	db.SetMaxIdleConns(1000)
+	db.Ping()
+}
 
 func main() {
 	//mux:=httpim.NewServeMux();
@@ -26,7 +37,7 @@ func CheckErr(err error)  {
 func  userLogin(w http.ResponseWriter, r *http.Request){
 
 
-	rows, err := db.Get().Query("select id,rid,appid from users")
+	rows, err := db.Query("select id,rid,appid from users")
 
 	defer rows.Close()
 
