@@ -19,13 +19,17 @@ func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 	var resultUser = NewUser();
 	ReadJson(r.Body,&resultUser)
 
-	if isok:=IsExistUser(app_id,resultUser.Rid);isok {
-		ResponseError(w,http.StatusBadRequest,"用户信息已存在!");
+	authBackend := InitJWTAuthenticationBackend();
+
+	if user:= QueryUserInfo(app_id,resultUser.Rid);user!=nil{
+
+		user.Token,_ =authBackend.GenerateToken(user.OpenId)
+		WriteJson(w,user)
 		return;
 	}
 
 	openId :=GenerOpenId();
-	authBackend := InitJWTAuthenticationBackend();
+
 	token,erro := authBackend.GenerateToken(openId);
 	CheckErr(erro)
 
@@ -60,6 +64,11 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 	if user:= QueryUserInfo(app_id,r_id);user!=nil{
 
+		authBackend := InitJWTAuthenticationBackend();
+		token,erro := authBackend.GenerateToken(user.OpenId);
+		CheckErr(erro)
+
+		user.Token=token;
 		WriteJson(w,user)
 		return;
 	}

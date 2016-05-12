@@ -9,7 +9,7 @@ var db *sql.DB
 
 func init() {
 
-	db, _ = sql.Open("mysql", "tangtao:123456@tcp(172.30.121.158:3306)/sampledb?charset=utf8")
+	db, _ = sql.Open("mysql", "tangtao:123456@tcp(127.0.0.1:3307)/sampledb?charset=utf8")
 	db.SetMaxOpenConns(2000)
 	db.SetMaxIdleConns(1000)
 	db.Ping()
@@ -17,7 +17,7 @@ func init() {
 
 func AddUserInfo(user *User) bool {
 
-	_, err := db.Exec("insert into users(app_id,open_id,r_id,token) values(?,?,?,?)",user.Appid,user.OpenId,user.Rid,user.Token)
+	_, err := db.Exec("insert into users(app_id,open_id,r_id) values(?,?,?)",user.Appid,user.OpenId,user.Rid)
 
 	if err!=nil {
 
@@ -32,19 +32,17 @@ func AddUserInfo(user *User) bool {
 
 func QueryUserInfo(app_id string,r_id string)  *User {
 
-	rows, err := db.Query("select id,open_id,r_id,token from users where app_id=? and r_id=?",app_id,r_id)
+	rows, err := db.Query("select id,open_id,r_id from users where app_id=? and r_id=?",app_id,r_id)
 	defer rows.Close()
 	CheckErr(err)
 	if rows.Next() {
 		var id int64
 		var rid *string
 		var openId *string
-		var token *string
-		err = rows.Scan(&id,&openId,&rid,&token)
+		err = rows.Scan(&id,&openId,&rid)
 		CheckErr(err)
 
 		userModel :=NewUser();
-		userModel.Token=*token;
 		userModel.OpenId=*openId;
 		userModel.Rid=*rid;
 		//userModel.Id=id;

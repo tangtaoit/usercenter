@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
+	"os/exec"
+	"strings"
 )
 
 
@@ -60,5 +62,9 @@ func ReadJson( r io.ReadCloser,obj interface{})  error {
 
 func GenerOpenId()  string{
 
-	return "1223434554"
+	out, _ := exec.Command("uuidgen").Output()
+
+
+	return strings.TrimSpace(string(out))
 }
+
