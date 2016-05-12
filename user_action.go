@@ -21,7 +21,7 @@ func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 	authBackend := InitJWTAuthenticationBackend();
 
-	if user:= QueryUserInfo(app_id,resultUser.Rid);user!=nil{
+	if user,_:= QueryUserInfo(app_id,resultUser.Rid);user!=nil{
 
 		user.Token,_ =authBackend.GenerateToken(user.OpenId)
 		WriteJson(w,user)
@@ -62,7 +62,7 @@ func GetUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 	r_id :=r.FormValue("r_id");
 
-	if user:= QueryUserInfo(app_id,r_id);user!=nil{
+	if user,_:= QueryUserInfo(app_id,r_id);user!=nil{
 
 		authBackend := InitJWTAuthenticationBackend();
 		token,erro := authBackend.GenerateToken(user.OpenId);

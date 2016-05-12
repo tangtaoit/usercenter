@@ -15,6 +15,11 @@ func init() {
 	db.Ping()
 }
 
+func GetDB()  *sql.DB{
+
+	return db;
+}
+
 func AddUserInfo(user *User) bool {
 
 	_, err := db.Exec("insert into users(app_id,open_id,r_id) values(?,?,?)",user.Appid,user.OpenId,user.Rid)
@@ -30,26 +35,32 @@ func AddUserInfo(user *User) bool {
 
 }
 
-func QueryUserInfo(app_id string,r_id string)  *User {
+func QueryUserInfo(app_id string,r_id string)  (user *User, er error) {
 
 	rows, err := db.Query("select id,open_id,r_id from users where app_id=? and r_id=?",app_id,r_id)
 	defer rows.Close()
-	CheckErr(err)
+	if err!=nil{
+
+		return nil,err;
+	}
 	if rows.Next() {
 		var id int64
 		var rid *string
 		var openId *string
 		err = rows.Scan(&id,&openId,&rid)
-		CheckErr(err)
+		if err!=nil{
+
+			return nil,err
+		}
 
 		userModel :=NewUser();
 		userModel.OpenId=*openId;
 		userModel.Rid=*rid;
 		//userModel.Id=id;
-		return userModel;
+		return userModel,nil;
 	}
 
-	return nil;
+	return nil,err;
 }
 
 func IsExistUser(app_id string,r_id string) bool {
