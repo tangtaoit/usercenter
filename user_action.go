@@ -13,10 +13,13 @@ func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 	if isOk:=appIsOk(w,r);!isOk{
 		return;
 	}
+
+	vars := mux.Vars(r);
+	app_id := vars["app_id"];
 	var resultUser = NewUser();
 	ReadJson(r.Body,&resultUser)
 
-	if isok:=IsExistUser(resultUser.Appid,resultUser.Rid);isok {
+	if isok:=IsExistUser(app_id,resultUser.Rid);isok {
 		ResponseError(w,http.StatusBadRequest,"用户信息已存在!");
 		return;
 	}
@@ -31,10 +34,11 @@ func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 	user.Token=token;
 	user.Rid=resultUser.Rid;
 	user.OpenId=openId;
-	user.Appid=resultUser.Appid;
+	user.Appid=app_id;
 
 
 	if AddUserInfo(user) {
+		user.Appid="";
 		WriteJson(w,user)
 		return;
 	}
