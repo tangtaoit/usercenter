@@ -3,13 +3,21 @@ package main
 import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
+	"fmt"
 )
 
 var db *sql.DB
 
 func init() {
 
-	db, _ = sql.Open("mysql", "tangtao:123456@tcp(127.0.0.1:3307)/sampledb?charset=utf8")
+	setting :=GetSetting()
+
+
+	connInfo := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",setting.MysqlUser,setting.MysqlPassword,setting.MysqlHost,setting.MysqlDB)
+
+	fmt.Println(connInfo);
+
+	db, _ = sql.Open("mysql",connInfo)
 	db.SetMaxOpenConns(2000)
 	db.SetMaxIdleConns(1000)
 	db.Ping()

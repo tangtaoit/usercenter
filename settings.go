@@ -17,12 +17,16 @@ type Settings struct {
 	PrivateKeyPath     string
 	PublicKeyPath      string
 	JWTExpirationDelta int
+	MysqlHost	   string
+	MysqlPassword 	   string
+	MysqlUser	   string
+	MysqlDB  	   string
 }
 
-var settings Settings = Settings{}
+var settings *Settings
 var env = "preproduction"
 
-func init() {
+func Init() {
 	env = os.Getenv("GO_ENV")
 
 	pwd, _ := os.Getwd()
@@ -39,7 +43,7 @@ func LoadSettingsByEnv(env string) {
 	if err != nil {
 		fmt.Println("Error while reading config file", err)
 	}
-	settings = Settings{}
+	settings = &Settings{}
 	jsonErr := json.Unmarshal(content, &settings)
 	if jsonErr != nil {
 		fmt.Println("Error while parsing config file", jsonErr)
@@ -50,10 +54,11 @@ func GetEnvironment() string {
 	return env
 }
 
-func GetSetting() Settings {
-	//if &settings == nil {
-	//	Init()
-	//}
+func GetSetting() *Settings {
+	if settings == nil {
+		fmt.Println("------")
+		Init()
+	}
 	return settings
 }
 

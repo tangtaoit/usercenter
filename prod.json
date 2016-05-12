@@ -1,5 +1,9 @@
 {
-  "PrivateKeyPath": "/home/vagrant/go/src/api.jwt.auth/settings/keys/private_key",
-  "PublicKeyPath": "/home/vagrant/go/src/api.jwt.auth/settings/keys/public_key.pub",
-  "JWTExpirationDelta": 72
+  "PrivateKeyPath": "keys/private_key",
+  "PublicKeyPath": "keys/public_key.pub",
+  "JWTExpirationDelta": 72,
+  "MysqlHost":"172.30.121.158:3306",
+  "MysqlPassword":"123456",
+  "MysqlUser":"tangtao",
+  "MysqlDB":"sampledb"
 }
