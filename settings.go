@@ -1,4 +1,4 @@
-package settings
+package main
 
 import (
 	"encoding/json"
@@ -8,9 +8,9 @@ import (
 )
 
 var environments = map[string]string{
-	"production":    "settings/prod.json",
-	"preproduction": "settings/pre.json",
-	"tests":         "../../settings/tests.json",
+	"production":    "prod.json",
+	"preproduction": "pre.json",
+	"tests":         "../../tests.json",
 }
 
 type Settings struct {
@@ -50,7 +50,7 @@ func GetEnvironment() string {
 	return env
 }
 
-func Get() Settings {
+func GetSetting() Settings {
 	//if &settings == nil {
 	//	Init()
 	//}

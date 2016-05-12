@@ -8,7 +8,6 @@ import (
 	jwt "github.com/dgrijalva/jwt-go"
 	"os"
 	"time"
-	"usercenter/settings"
 )
 
 type JWTAuthenticationBackend struct {
@@ -36,7 +35,7 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 
 func (backend *JWTAuthenticationBackend) GenerateToken(openId string) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS512)
-	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(settings.Get().JWTExpirationDelta)).Unix()
+	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(GetSetting().JWTExpirationDelta)).Unix()
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["sub"] = openId
 	tokenString, err := token.SignedString(backend.privateKey)
@@ -63,7 +62,9 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 
 
 func getPrivateKey() *rsa.PrivateKey {
-	privateKeyFile, err := os.Open(settings.Get().PrivateKeyPath)
+
+
+	privateKeyFile, err := os.Open(GetSetting().PrivateKeyPath)
 	if err != nil {
 		panic(err)
 	}
@@ -89,7 +90,7 @@ func getPrivateKey() *rsa.PrivateKey {
 }
 
 func getPublicKey() *rsa.PublicKey {
-	publicKeyFile, err := os.Open(settings.Get().PublicKeyPath)
+	publicKeyFile, err := os.Open(GetSetting().PublicKeyPath)
 	if err != nil {
 		panic(err)
 	}
