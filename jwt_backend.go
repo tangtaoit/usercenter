@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var privateKey string ="-----BEGIN RSA PRIVATE KEY-----MIICXAIBAAKBgQDDZV7T3ZhIE03PxAN6CXMtDTKQ9vCBu0XrK0UD9UCPoaBJgy5LHz+z7+Pc+nCQT0AbvbroKveSdmOhz7zs6RulNjQQPUP8175Ci8p5n0jouAKV5s4K4BtjwuMzxKyZNHReJ1yTXQ3FjHpOzr0JzqBZ3S4EB7CBkQUb4Te0WfSf7QIDAQABAoGAFXaqLv21f51XO85dT2eAVl+PwWrOyoFm0clkAGZNXDm14L1fNXNOTRa54glEmiWKdkGmKWCm51jH4vtt1lxY4+CoEj3x2qnJ3SsqxE2gJiC2ASIxgpmkV1T14MEzwJO9LCVEzefHcEdtJwTs5o9CIiCFMH5mpw0OzvMTz/4d86ECQQD3ehzpmdA0xw/s/CBIs9Upe1qkmTCQVRUmyz8iWZPjVLsAjBwn0ZtDPXze5ln4pxopvtoqdbCimW2yuWXy+TS5AkEAyiAVdt3AQsqSIn0lzA7hPl7E6ACM9k54GR3ngmiUCgwMLn9GXNZRXzLY52nj2u1t1c9aqvEnfvGHo1qHqDzS1QJBALWYO4MGxQsVTxBc6euvWil4RMknR8WBSWYQGiHAjY5w7E+4gCiP3Fh41BpT+Y1GQSKE0134wkZuQ1q0RKUITLECQCZ8q3mhyd0t81uL1umfH7aflwDSMgUodefacN29CgtLtfoYlA5TZNUqunB+Ejv6n8JppEsOdkXOudQaBeC8DC0CQDmQQFXx36Ip4jTUj/CaiZTXpfbszSYr8zQ8PJUqC4oZr2N2wBMiJps4zIaQau6zOOYRegJx/waJL6p+y1dRzwo=-----END RSA PRIVATE KEY-----"
+
 type JWTAuthenticationBackend struct {
 	privateKey *rsa.PrivateKey
 	PublicKey  *rsa.PublicKey
@@ -58,6 +60,7 @@ func (backend *JWTAuthenticationBackend) getTokenRemainingValidity(timestamp int
 	}
 	return expireOffset
 }
+
 
 
 

@@ -1,5 +1,5 @@
 {
-  "PrivateKeyPath": "/work/goroot/src/usercenter/settings/keys/private_key",
-  "PublicKeyPath": "/work/goroot/src/usercenter/settings/keys/public_key.pub",
+  "PrivateKeyPath": "keys/private_key",
+  "PublicKeyPath": "keys/public_key.pub",
   "JWTExpirationDelta": 72
 }
