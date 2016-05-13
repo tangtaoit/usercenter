@@ -36,7 +36,7 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 }
 
 func (backend *JWTAuthenticationBackend) GenerateToken(openId string) (string, error) {
-	token := jwt.New(jwt.SigningMethodRS512)
+	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(GetSetting().JWTExpirationDelta)).Unix()
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["sub"] = openId

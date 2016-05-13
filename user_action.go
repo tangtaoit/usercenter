@@ -16,9 +16,17 @@ func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 	vars := mux.Vars(r);
 	app_id := vars["app_id"];
-	var resultUser = NewUser();
-	ReadJson(r.Body,&resultUser)
 
+
+
+	var resultUser = NewUser();
+	CheckErr(ReadJson(r.Body,&resultUser))
+
+	if resultUser.Rid=="" {
+
+		ResponseError(w,http.StatusBadRequest,"关联的ID不能为空!");
+		return;
+	}
 	authBackend := InitJWTAuthenticationBackend();
 
 	if user,_:= QueryUserInfo(app_id,resultUser.Rid);user!=nil{
