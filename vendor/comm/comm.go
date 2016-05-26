@@ -1,4 +1,4 @@
-package main
+package comm
 
 import (
 	"net/http"
@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"os/exec"
 	"strings"
+	"bytes"
+	"github.com/sumory/idgen"
 )
 
 
@@ -32,6 +34,13 @@ func ResponseError(w http.ResponseWriter, statusCode int,msg string)  {
 	http.Error(w,"未知错误",500);
 }
 
+func ResponseSuccess(w http.ResponseWriter)  {
+
+	err := NewResultError(0,"OK")
+	WriteJson(w,err)
+
+}
+
 func WriteJson(w io.Writer,obj interface{})  {
 
 	jsonData,_:= json.Marshal(obj);
@@ -49,10 +58,13 @@ func ReadJson( r io.ReadCloser,obj interface{})  error {
 	if err := r.Close(); err != nil {
 		panic(err)
 	}
-	if err := json.Unmarshal(body, obj); err != nil {
+	mdz:=json.NewDecoder(bytes.NewBuffer(body))
 
+	mdz.UseNumber()
+	err = mdz.Decode(obj)
+
+	if  err != nil {
 		return err;
-
 	}
 
 	return nil;
@@ -60,11 +72,35 @@ func ReadJson( r io.ReadCloser,obj interface{})  error {
 	
 }
 
-func GenerOpenId()  string{
+func GenerUUId()  string{
 
 	out, _ := exec.Command("uuidgen").Output()
 
 
-	return strings.TrimSpace(string(out))
+	return strings.Replace(strings.TrimSpace(string(out)),"-","",-1)
 }
 
+//生成APPID
+func GenerAppId() int64  {
+	err, idWorker := idgen.NewIdWorker(1)
+	CheckErr(err)
+	err,appid := idWorker.NextId()
+	CheckErr(err)
+	return appid;
+}
+
+type ResultError struct {
+
+	ErrCode int `json:"err_code"`
+	ErrMsg string `json:"err_msg"`
+
+}
+
+func NewResultError(errCode int,errMsg string) *ResultError  {
+
+	resultError := &ResultError{}
+	resultError.ErrCode=errCode;
+	resultError.ErrMsg=errMsg
+
+	return  resultError
+}

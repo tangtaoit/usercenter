@@ -2,97 +2,84 @@ package main
 
 import (
 	"net/http"
-	"github.com/gorilla/mux"
+	"comm"
+	"db"
 )
-
 
 //绑定用户信息
 func BindUserInfo(w http.ResponseWriter, r *http.Request)  {
 
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if isOk:=appIsOk(w,r);!isOk{
+	appId,_,_,isOk:=AppIsOk(w,r);
+	if!isOk{
 		return;
 	}
-
-	vars := mux.Vars(r);
-	app_id := vars["app_id"];
-
-
-
-	var resultUser = NewUser();
-	CheckErr(ReadJson(r.Body,&resultUser))
+	var resultUser = NewUserDto();
+	comm.CheckErr(comm.ReadJson(r.Body,&resultUser))
 
 	if resultUser.Rid=="" {
 
-		ResponseError(w,http.StatusBadRequest,"关联的ID不能为空!");
+		comm.ResponseError(w,http.StatusBadRequest,"关联的ID不能为空!");
 		return;
 	}
+
 	authBackend := InitJWTAuthenticationBackend();
 
-	if user,_:= QueryUserInfo(app_id,resultUser.Rid);user!=nil{
+	user := db.NewUser()
+	if user,_:= user.QueryUserInfo(appId,resultUser.Rid);user!=nil{
 
-		user.Token,_ =authBackend.GenerateToken(user.OpenId)
-		WriteJson(w,user)
+		resultUser.Token,_ =authBackend.GenerateToken(user.OpenId)
+		resultUser.OpenId=user.OpenId
+		comm.WriteJson(w,resultUser)
 		return;
 	}
 
-	openId :=GenerOpenId();
+	openId :=comm.GenerUUId();
 
 	token,erro := authBackend.GenerateToken(openId);
-	CheckErr(erro)
+	comm.CheckErr(erro)
+	resultUser.Token =token
+	resultUser.OpenId=openId
 
-
-	user :=NewUser();
-	user.Token=token;
+	user =db.NewUser();
 	user.Rid=resultUser.Rid;
-	user.OpenId=openId;
-	user.Appid=app_id;
+	user.OpenId=openId
+	user.AppId=appId;
+	user.Status=0
 
-
-	if AddUserInfo(user) {
-		user.Appid="";
-		WriteJson(w,user)
+	if user.Insert() {
+		comm.WriteJson(w,resultUser)
 		return;
+	}else{
+		comm.ResponseError(w,http.StatusBadRequest,"用户添加失败!")
+		return
 	}
 
 }
 
 //获取认证信息
 func GetUserInfo(w http.ResponseWriter, r *http.Request)  {
-
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-
-	if isOk:=appIsOk(w,r);!isOk{
+	appId,_,_,isOk:=AppIsOk(w,r);
+	if !isOk{
 		return;
 	}
-	vars := mux.Vars(r);
-	app_id := vars["app_id"];
-
 	r_id :=r.FormValue("r_id");
-
-	if user,_:= QueryUserInfo(app_id,r_id);user!=nil{
+	user :=db.NewUser()
+	if user,_:= user.QueryUserInfo(appId,r_id);user!=nil{
 
 		authBackend := InitJWTAuthenticationBackend();
 		token,erro := authBackend.GenerateToken(user.OpenId);
-		CheckErr(erro)
+		comm.CheckErr(erro)
 
-		user.Token=token;
-		WriteJson(w,user)
+		userDto :=NewUserDto()
+		userDto.Token=token
+		userDto.AppId=appId
+		comm.WriteJson(w,user)
 		return;
+	}else{
+		comm.ResponseError(w,http.StatusBadRequest,"用户不存在!")
 	}
 }
 
 
-
-func appIsOk(w http.ResponseWriter,r *http.Request) bool {
-	vars := mux.Vars(r);
-	app_id := vars["app_id"];
-	app_key := vars["app_key"];
-
-	if err:=AuthApp(app_id,app_key);err!=nil{
-		ResponseError(w,http.StatusUnauthorized,"appid和appkey不合法!")
-		return false;
-	}
-
-	return true;
-}

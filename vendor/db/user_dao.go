@@ -1,49 +1,36 @@
-package main
+package db
 
 import (
-	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
-	"fmt"
+	"comm"
 )
 
-var db *sql.DB
-
-func init() {
-
-	setting :=GetSetting()
-
-
-	connInfo := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8",setting.MysqlUser,setting.MysqlPassword,setting.MysqlHost,setting.MysqlDB)
-
-	fmt.Println(connInfo);
-
-	db, _ = sql.Open("mysql",connInfo)
-	db.SetMaxOpenConns(2000)
-	db.SetMaxIdleConns(1000)
-	db.Ping()
+type User struct {
+	AppId string
+	OpenId string
+	Rid string
+	Status int
 }
 
-func GetDB()  *sql.DB{
+func NewUser()  *User {
 
-	return db;
+	return &User{}
 }
 
-func AddUserInfo(user *User) bool {
 
-	_, err := db.Exec("insert into users(app_id,open_id,r_id) values(?,?,?)",user.Appid,user.OpenId,user.Rid)
+func (self *User) Insert() bool {
 
+	_, err := db.Exec("insert into users(app_id,open_id,r_id,status) values(?,?,?,?)",self.AppId,self.OpenId,self.Rid,self.Status)
 	if err!=nil {
 
-		CheckErr(err)
+		comm.CheckErr(err)
 		return false;
 	}
-
 	return true;
-
 
 }
 
-func QueryUserInfo(app_id string,r_id string)  (user *User, er error) {
+func (self *User)  QueryUserInfo(app_id string,r_id string)  (user *User, er error) {
 
 	rows, err := db.Query("select id,open_id,r_id from users where app_id=? and r_id=?",app_id,r_id)
 	defer rows.Close()
@@ -71,16 +58,16 @@ func QueryUserInfo(app_id string,r_id string)  (user *User, er error) {
 	return nil,err;
 }
 
-func IsExistUser(app_id string,r_id string) bool {
+func (self *User)  IsExistUser(app_id string,r_id string) bool {
 	rows, err := db.Query("select count(*) cn from users where app_id=? and r_id=?",app_id,r_id)
 	defer rows.Close()
-	CheckErr(err)
+	comm.CheckErr(err)
 
 	if rows.Next() {
 		var cn int
 
 		err = rows.Scan(&cn)
-		CheckErr(err)
+		comm.CheckErr(err)
 
 		if cn>0{
 

@@ -4,25 +4,23 @@ import (
 	"log"
 )
 
-type User struct {
+type UserDto struct {
 
-	//用户ID
-	Id int64 `json:"id,omitempty"`
 	//公开的用户唯一ID
 	OpenId string `json:"open_id,omitempty"`
 	//用户关联ID
 	Rid string `json:"r_id,omitempty"`
 	//APPID
-	Appid string `json:"app_id,omitempty"`
+	AppId string `json:"app_id,omitempty"`
 	//用户凭证
 	Token string `json:"token,omitempty"`
 
 }
 
 
-func NewUser()  *User{
+func NewUserDto()  *UserDto{
 
-	return &User{}
+	return &UserDto{}
 }
 
 func init()  {
@@ -34,12 +32,7 @@ func init()  {
 
 
 
-type ResultError struct {
 
-	ErrCode int `json:"err_code"`
-	ErrMsg string `json:"err_msg"`
-
-}
 
 
 

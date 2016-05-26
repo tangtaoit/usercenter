@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 )
 
 var environments = map[string]string{
-	"production":    "prod.json",
-	"preproduction": "pre.json",
+	"production":    "config/prod.json",
+	"preproduction": "config/pre.json",
 	"tests":         "../../tests.json",
 }
 
@@ -26,11 +26,9 @@ type Settings struct {
 var settings *Settings
 var env = "preproduction"
 
-func Init() {
+func InitSetting() {
 	env = os.Getenv("GO_ENV")
 
-	pwd, _ := os.Getwd()
-	fmt.Println(pwd)
 	if env == "" {
 		fmt.Println("Warning: Setting preproduction environment due to lack of GO_ENV value")
 		env = "preproduction"
@@ -57,7 +55,7 @@ func GetEnvironment() string {
 func GetSetting() *Settings {
 	if settings == nil {
 		fmt.Println("------")
-		Init()
+		InitSetting()
 	}
 	return settings
 }
