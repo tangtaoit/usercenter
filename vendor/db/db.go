@@ -5,17 +5,16 @@ import (
 	"database/sql"
 	"comm"
 	"config"
-	"time"
+	"net/url"
 )
 var db *sql.DB
 func init() {
 
-	loc,_ := time.LoadLocation("Local")
 
 
 
 	setting :=config.GetSetting()
-	connInfo := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&loc=%s&parseTime=true",setting.MysqlUser,setting.MysqlPassword,setting.MysqlHost,setting.MysqlDB,loc.String())
+	connInfo := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8&loc=%s&parseTime=true",setting.MysqlUser,setting.MysqlPassword,setting.MysqlHost,setting.MysqlDB,url.QueryEscape("Asia/Beijing"))
 	fmt.Println(connInfo);
 	var err error;
 	db, err = sql.Open("mysql",connInfo)
