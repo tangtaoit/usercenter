@@ -2,7 +2,6 @@ package db
 
 import (
 	"fmt"
-	"net/url"
 	"database/sql"
 	"comm"
 	"config"
