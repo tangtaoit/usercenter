@@ -1,7 +1,9 @@
 package db
 
-
-import "comm"
+import (
+	"comm"
+	"time"
+)
 
 type APP struct  {
 	Id uint64
@@ -17,6 +19,10 @@ type APP struct  {
 	Status int
 	//openID
 	OpenId string
+	//创建时间
+	CreateTime time.Time
+	//修改时间
+	UpdateTime time.Time
 }
 
 func NewAPP() *APP  {
@@ -26,9 +32,12 @@ func NewAPP() *APP  {
 
 func (self *APP)  Insert() bool{
 
-	stmt,err :=db.Prepare("insert into app(app_id,app_key,app_name,app_desc,status) values(?,?,?,?,?)")
+	self.CreateTime=time.Now()
+	self.UpdateTime=time.Now()
+
+	stmt,err :=db.Prepare("insert into app(app_id,app_key,app_name,app_desc,status,create_time,update_time) values(?,?,?,?,?,?,?)")
 	comm.CheckErr(err)
-	_,err =stmt.Exec(self.AppId,self.AppKey,self.AppName,self.AppDesc,self.Status)
+	_,err =stmt.Exec(self.AppId,self.AppKey,self.AppName,self.AppDesc,self.Status,self.CreateTime,self.UpdateTime)
 	comm.CheckErr(err)
 	return true
 }
