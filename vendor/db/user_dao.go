@@ -3,6 +3,7 @@ package db
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"comm"
+	"fmt"
 )
 
 type User struct {
@@ -35,7 +36,7 @@ func (self *User)  QueryUserInfo(app_id string,r_id string)  (user *User, er err
 	rows, err := db.Query("select id,open_id,r_id from users where app_id=? and r_id=?",app_id,r_id)
 	defer rows.Close()
 	if err!=nil{
-
+		fmt.Println("error=",err)
 		return nil,err;
 	}
 	if rows.Next() {

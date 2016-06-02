@@ -27,11 +27,7 @@ func CheckErr(err error)  {
 
 func ResponseError(w http.ResponseWriter, statusCode int,msg string)  {
 	err := ResultError{statusCode, msg}
-	if jsonData,er := json.Marshal(err);er==nil{
-		http.Error(w,string(jsonData),err.ErrCode)
-		return;
-	}
-	http.Error(w,"未知错误",500);
+	WriteJson(w,err)
 }
 
 func ResponseSuccess(w http.ResponseWriter)  {

@@ -6,57 +6,70 @@ import (
 	"net/http"
 	"github.com/codegangsta/negroni"
 	"github.com/stretchr/testify/assert"
-	. "gopkg.in/check.v1"
-	"strings"
+	"os"
+	"fmt"
+	"crypto/md5"
+	"time"
+	"github.com/tangtaoit/util"
+	"encoding/json"
+	"bytes"
 )
 
-func Test(t *testing.T) {
-	TestingT(t)
-}
-var _ = Suite(&MiddlewaresTestSuite{})
 var server *negroni.Negroni
 
-type MiddlewaresTestSuite struct{}
+var basesign string
+var noncestr string
+var timestamp string
+var apikey string
 
-func (s *MiddlewaresTestSuite) SetUpTest(c *C) {
+func initSetting()  {
 
-	//router := NewRouter()
-	//server = negroni.Classic()
-	//server.UseHandler(router)
+	os.Setenv("GO_ENV", "tests")
+
+	apikey ="f99b45c3f5d747658d421c9e75c469eb"
+	noncestr ="23435"
+	timestamp =fmt.Sprintf("%d",time.Now().Unix())
+
+	signStr := apikey+noncestr+timestamp
+	bytes  := md5.Sum([]byte(signStr))
+	basesign =fmt.Sprintf("%X",bytes)
+
+	router :=GetRouters()
+	server = negroni.Classic()
+	server.UseHandler(router)
 }
 
-func (self *MiddlewaresTestSuite) TestQueryUserInfo(c *C) {
+func TestBindUserInfo(t *testing.T) {
 
-	//_,err :=QueryUserInfo("test","1");
-	//
-	//if err!=nil{
-	//	c.Error(err)
-	//}
+	initSetting()
 
-}
+	resource := "/users/auth"
 
-func  (self *MiddlewaresTestSuite) TestBindUserInfo(c *C) {
+	params :=map[string]interface{}{
+		"r_id":"1",
+	}
 
-	resource := "/users/auth/test/1"
+	sign := util.SignWithBaseSign(params,apikey,basesign,nil)
+	paramsBytes,err := json.Marshal(params)
+	util.CheckErr(err)
 
 	response := httptest.NewRecorder()
-	request, _ := http.NewRequest("POST", resource, strings.NewReader("{\"r_id\":\"1\"}"))
+	request, _ := http.NewRequest("POST", resource, bytes.NewReader(paramsBytes))
+	request.Header.Set("app_id","194251277981454336")
+	request.Header.Set("sign",fmt.Sprintf("%s.%s",basesign,sign))
+	request.Header.Set("noncestr",noncestr)
+	request.Header.Set("timestamp",timestamp)
+
+	//request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", token))
 	server.ServeHTTP(response, request)
 
-	assert.Equal(c, response.Code, http.StatusOK)
+	assert.Equal(t, response.Code, http.StatusOK)
 
-}
+	var result map[string]interface{}
+	err = json.Unmarshal(response.Body.Bytes(),&result)
+	util.CheckErr(err)
 
+	fmt.Println("result =%s",result)
 
-
-func (self *MiddlewaresTestSuite) TestGetUserInfo(c *C)   {
-
-	resource := "/users/auth/test/1?r_id=1"
-
-	response := httptest.NewRecorder()
-	request, _ := http.NewRequest("GET", resource, nil)
-	server.ServeHTTP(response, request)
-
-	assert.Equal(c, response.Code, http.StatusOK)
 
 }

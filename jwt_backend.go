@@ -36,11 +36,12 @@ func InitJWTAuthenticationBackend() *JWTAuthenticationBackend {
 	return authBackendInstance
 }
 
-func (backend *JWTAuthenticationBackend) GenerateToken(openId string) (string, error) {
+func (backend *JWTAuthenticationBackend) GenerateToken(openId string,appId string) (string, error) {
 	token := jwt.New(jwt.SigningMethodRS256)
 	token.Claims["exp"] = time.Now().Add(time.Hour * time.Duration(config.GetSetting().JWTExpirationDelta)).Unix()
 	token.Claims["iat"] = time.Now().Unix()
 	token.Claims["sub"] = openId
+	token.Claims["app_id"] = appId
 	tokenString, err := token.SignedString(backend.privateKey)
 	if err != nil {
 		panic(err)

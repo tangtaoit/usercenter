@@ -3,13 +3,12 @@ package main
 import (
 	"net/http"
 	"log"
+	"github.com/gorilla/mux"
 )
 
+func GetRouters() *mux.Router {
 
-
-func main() {
-
-	router := NewRouter([]Route{
+	return  NewRouter([]Route{
 		Route{
 			"GetUserInfo",
 			"GET",
@@ -29,6 +28,12 @@ func main() {
 			SubmitApp,
 		},
 	})
-	log.Fatal(http.ListenAndServe(":8080", router))
+}
+
+func main() {
+
+
+	
+	log.Fatal(http.ListenAndServe(":8080", GetRouters()))
 }
 
